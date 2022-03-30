@@ -4,9 +4,9 @@ from importlib import import_module
 import pytorch_lightning
 import torch.nn.functional as F
 import torchmetrics
-import torchvision
 from torch import nn
 
+from computervision.lightning_modules.backbones import Resnet
 from computervision.utils.config_utils import ConfigMixin, REQUIRED
 from computervision.utils.misc_utils import get_module_and_class_names
 
@@ -14,7 +14,7 @@ from computervision.utils.misc_utils import get_module_and_class_names
 class Classifier(pytorch_lightning.LightningModule):
     @dataclass
     class Config(ConfigMixin):
-        backbone: str
+        backbone: Resnet.Config = REQUIRED
 
         # ex: "torch.optim.AdamW"
         optimizer_class: str = REQUIRED
@@ -39,10 +39,7 @@ class Classifier(pytorch_lightning.LightningModule):
         self.save_hyperparameters()
 
         # Create backbone
-        backbone_func = getattr(torchvision.models, config.backbone)
-        self.backbone = backbone_func(pretrained=False)
-        num_ftrs = self.backbone.fc.in_features
-        self.backbone.fc = nn.Linear(num_ftrs, 10)
+        self.backbone = Resnet(config.backbone).create()
 
         # Create metrics
         metrics = dict()

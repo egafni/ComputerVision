@@ -5,6 +5,7 @@ from typing import Type, Iterable
 
 from computervision.data.data_modules import CIFAR10DataModule
 from computervision.data.pre_processor import PreProcessor
+from computervision.lightning_modules.backbones import Resnet
 from computervision.lightning_modules.classifier import Classifier
 from computervision.train import TrainConfig, TrainerConfig
 from computervision.utils.misc_utils import get_subclasses_from_object_dict
@@ -24,11 +25,12 @@ class Cifar10(ExperimentGroup):
             data_module=CIFAR10DataModule.Config(batch_size=2048,
                                                  pre_processor=PreProcessor.Config('cifar10_default')),
             lightning_module=Classifier.Config(
-                backbone='resnet18',
+                backbone=Resnet.Config(input_size=(3, 32, 32), resnet_version='resnet18', num_classes=10,
+                                       pretrained=False),
                 optimizer_class="torch.optim.AdamW",
-                optimizer_init_params={'lr': 3e-4},
+                optimizer_init_params={'lr': 1e-2, 'weight_decay': 1e-5},
                 scheduler_class="torch.optim.lr_scheduler.ReduceLROnPlateau",
-                scheduler_init_params={'factor': 0.1, 'patience': 5},
+                scheduler_init_params={'factor': 0.1, 'patience': 5, 'verbose': True},
                 scheduler_lightning_cfg={'monitor': 'val/acc', 'mode': 'min'},
             ),
             model_checkpoint=dict(
@@ -45,6 +47,7 @@ class Cifar10(ExperimentGroup):
             trainer=TrainerConfig(
                 gpu=1,
                 max_epochs=500,
+                accelerator='gpu'
             )
         )
 

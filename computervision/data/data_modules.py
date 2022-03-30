@@ -34,7 +34,6 @@ class CIFAR10DataModule(LightningDataModule):
         Cifar10 Datamodule
         """
         super().__init__(*args, **kwargs)
-        # self.dims = (3, 32, 32)
         self.DATASET = CIFAR10
         self.config = config
         self.pre_processor = PreProcessor(self.config.pre_processor)

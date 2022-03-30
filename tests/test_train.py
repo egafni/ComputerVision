@@ -33,6 +33,7 @@ def test_train(tmpdir):
         experiment_group='test',
         seed=1,
         trainer=TrainerConfig(
+            accelerator='cpu',
             limit_train_batches=2,
             limit_val_batches=2,
             limit_test_batches=2,
