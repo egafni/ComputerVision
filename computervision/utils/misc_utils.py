@@ -2,8 +2,10 @@ import logging
 import subprocess
 from multiprocessing import cpu_count
 from subprocess import check_output
+from typing import Tuple
 
 logger = logging.getLogger(__name__)
+
 
 class ClassPropertyDescriptor:
     """copied from https://stackoverflow.com/questions/5189699/how-to-make-a-class-property"""
@@ -39,6 +41,7 @@ def classproperty(func):
 
     return ClassPropertyDescriptor(func)
 
+
 def log_system_info():
     # log system info
     logger.info('*** System Info ****')
@@ -52,3 +55,15 @@ def log_system_info():
 
     logger.info("**** CPUs ****")
     logger.info(f"{cpu_count()} CPUs detected")
+
+
+def get_module_and_class_names(class_path: str) -> Tuple[str, str]:
+    """
+    Return module name and class name from full class path
+    >>> get_module_and_class_names("torch.optim.Adam")
+    ('torch.optim', 'Adam')
+    """
+    split = class_path.split(".")
+    class_name = split[-1]
+    module_name = ".".join(split[:-1])
+    return module_name, class_name

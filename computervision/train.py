@@ -174,7 +174,6 @@ def train_model(config: TrainConfig):
             output_dir=config.output_dir,
             checkpoint_dirpath=checkpoint_dirpath,
             callback_metrics={k: float(v) for k, v in metrics.items()},
-            dataset_info=data_module.dataset_info.to_dict(),
         )
         json.dump(results, fp=fp)
 
