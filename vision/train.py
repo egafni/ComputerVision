@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from getpass import getpass
+from getpass import getuser
 from typing import Optional, Union
 
 from pytorch_lightning import Trainer
@@ -74,7 +74,7 @@ class TrainConfig(ConfigClassMixin):
         metadata=dict(help="a name to group experiments by, for example in wandb"),
     )
     user: str = field(
-        default=getpass.getuser(),
+        default=getuser(),
         metadata=dict(help="username of the person running this experiment, defaults to current unix user"),
     )
     logger: str = field(

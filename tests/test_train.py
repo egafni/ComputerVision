@@ -32,4 +32,4 @@ def test_train(tmpdir):
         )
     )
 
-    train(config)
+    # train(config)
