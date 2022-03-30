@@ -21,7 +21,7 @@ class Cifar10(ExperimentGroup):
         yield TrainConfig(
             name='test',
             base_output_dir='experiments/cifar10',
-            data_module=CIFAR10DataModule.Config(batch_size=32,
+            data_module=CIFAR10DataModule.Config(batch_size=2048,
                                                  pre_processor=PreProcessor.Config('cifar10_default')),
             lightning_module=Classifier.Config(
                 backbone='resnet18',
@@ -44,7 +44,7 @@ class Cifar10(ExperimentGroup):
             seed=1,
             trainer=TrainerConfig(
                 gpu=1,
-                max_epochs=1,
+                max_epochs=500,
             )
         )
 
