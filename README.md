@@ -19,21 +19,17 @@ Install poetry: https://python-poetry.org/docs/#installation
 
     poetry run pytest
 
-## Training
-
-    python train.py
-
-## Docker (TODO)
-
-* Dockerfile to build the image
-
-## Submitting a Bunch of Experiments
+## Running Experiments
 
     # specify your Experiment in run_experiments.py
 
-    $ python run_experiments.py -e ExperimentName
+    $ poetry run python run_experiments.py -e ExperimentGroupName -m run
 
-## Submitting Cloud Individual Jobs
+## Docker (TODO)
+
+Dockerfile to build the image
+
+## Submitting Cloud Individual Jobs (TODO)
 
     The submit.py script allows you to run any arbitrary command (such as training a model) in the cloud
     in the exact environment of the current repository.
