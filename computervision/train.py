@@ -1,3 +1,4 @@
+import argparse
 import json
 import logging
 import os
@@ -8,29 +9,29 @@ from typing import Optional, Union
 import fsspec
 import pytorch_lightning
 from pytorch_lightning import seed_everything
-from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping, GPUStatsMonitor, StochasticWeightAveraging, \
-    ModelCheckpoint
+from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping, StochasticWeightAveraging, \
+    ModelCheckpoint, DeviceStatsMonitor
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 
 from computervision.data.data_modules import CIFAR10DataModule
 from computervision.lightning_modules.classifier import Classifier
-from computervision.utils.config_utils import ConfigClassMixin, REQUIRED
+from computervision.utils.config_utils import ConfigMixin, REQUIRED
 
 
 @dataclass
-class TrainerConfig(ConfigClassMixin):
+class TrainerConfig(ConfigMixin):
     """pytorch_lightning.Trainer parameters, for detailed help see the pytorch_lightning documentation"""
 
-    limit_train_batches: Union[int, float] = field(
-        default=1.0,
+    limit_train_batches: Union[int, float, None] = field(
+        default=None,
         metadata=dict(help="limit the number of training batches, can be useful for quick testing"),
     )
-    limit_val_batches: Union[int, float] = field(
-        default=1.0,
+    limit_val_batches: Union[int, float, None] = field(
+        default=None,
         metadata=dict(help="limit the number of validation batches, can be useful for quick testing"),
     )
-    limit_test_batches: Union[int, float] = field(
-        default=1.0,
+    limit_test_batches: Union[int, float, None] = field(
+        default=None,
         metadata=dict(help="limit the number of test batches, can be useful for quick testing"),
     )
     gpu: Optional[int] = field(
@@ -48,7 +49,7 @@ class TrainerConfig(ConfigClassMixin):
 
 
 @dataclass
-class TrainConfig(ConfigClassMixin):
+class TrainConfig(ConfigMixin):
     """Top level config for training a model"""
 
     # required params
@@ -138,7 +139,7 @@ def train_model(config: TrainConfig):
     if config.early_stopping:
         callbacks.append(EarlyStopping(**config.early_stopping))
     if config.trainer.gpu is not None:
-        callbacks.append(GPUStatsMonitor())
+        callbacks.append(DeviceStatsMonitor())
     if config.swa:
         callbacks.append(StochasticWeightAveraging(**config.swa))
 
@@ -147,7 +148,7 @@ def train_model(config: TrainConfig):
         deterministic=True,
         weights_summary="top",
         max_time={"days": 4},
-        terminate_on_nan=True,
+        detect_anomaly=True,
         limit_train_batches=config.trainer.limit_train_batches,
         limit_val_batches=config.trainer.limit_val_batches,
         limit_test_batches=config.trainer.limit_test_batches,
@@ -180,3 +181,10 @@ def train_model(config: TrainConfig):
     logging.info(f"output_dir: {config.output_dir}")
 
     return results, trainer, data_module
+
+
+if __name__ == '__main__':
+    p = argparse.ArgumentParser()
+    p.add_argument('--config', type=str, required=True, help='path to a TrainConfig yaml file')
+    args = p.parse_args()
+    train_model(TrainConfig.from_yaml_file(args.config))

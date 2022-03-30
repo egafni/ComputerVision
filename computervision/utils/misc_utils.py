@@ -1,8 +1,9 @@
 import logging
 import subprocess
+from inspect import isclass
 from multiprocessing import cpu_count
 from subprocess import check_output
-from typing import Tuple
+from typing import Tuple, Type, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -67,3 +68,21 @@ def get_module_and_class_names(class_path: str) -> Tuple[str, str]:
     class_name = split[-1]
     module_name = ".".join(split[:-1])
     return module_name, class_name
+
+
+def get_subclasses_from_object_dict(class_: Type, object_dict: dict) -> Dict[str, Type]:
+    """
+    Returns all of the subclasses of class_ that are inside object_dict, which is usually passed in as the
+    globals() of the caller.
+
+    Useful for getting all of the subclasses of a class that are defined in a module.
+
+    :param class_: A class
+    :param object_dict: an object dictionary (for ex the output of globals())
+    :return: dict of {"class_name": class, ...} where class is as subtype of class_
+    """
+    return {
+        var_name: variable
+        for var_name, variable in object_dict.items()
+        if isclass(variable) and issubclass(variable, class_) and var_name != class_.__name__
+    }

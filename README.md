@@ -8,6 +8,9 @@ Install poetry: https://python-poetry.org/docs/#installation
     git clone git@github.com:egafni/ComputerVision.git
     poetry install
 
+    # IF you have cuda11 installed, overwrite the proper version of torch
+    poetry run pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113 -I --no-depspoetry run pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113 -I --no-deps
+
 ## Activating VirtualEnv
 
     poetry shell

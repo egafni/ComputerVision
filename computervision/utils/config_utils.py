@@ -1,14 +1,12 @@
-import json
+import dataclasses
 import os
+from dataclasses import fields
 from typing import Any
 
 import dacite
-import dataclasses
 import fsspec
 import yaml
 from dacite import DaciteError
-from dataclasses import fields
-from pytorch_lightning.utilities.cloud_io import get_filesystem
 
 from computervision.utils.misc_utils import classproperty
 
@@ -51,10 +49,11 @@ def check_required(obj, path=""):
         raise DaciteError(f"{path} is a required field")
 
 
-class ConfigClassMixin:
+class ConfigMixin:
     """
     A mixin for a dataclass used to create composable Configuration objects.
     """
+
     def __post_init__(self):
         check_required(self)
 
@@ -73,7 +72,6 @@ class ConfigClassMixin:
                 val = getattr(self, field.name)
                 if val not in field.metadata["choices"]:
                     raise ValueError(f'{field.name} is invalid, it must be in {field.metadata["choices"]}')
-
 
     @classproperty
     def fields(cls):
@@ -106,11 +104,6 @@ class ConfigClassMixin:
             yield getattr(self, field_name)
 
     @classmethod
-    def from_json_path(cls, path):
-        with get_filesystem(path).open(path, "r") as fp:
-            return cls.from_dict(json.load(fp))
-
-    @classmethod
     def from_yaml_file(cls, path):
         with fsspec.open(path) as fp:
             s = fp.read().decode()
@@ -123,3 +116,11 @@ class ConfigClassMixin:
 
     def to_yaml(self):
         return yaml.dump(self.to_dict())
+
+    def to_yaml_file(self, path):
+        with fsspec.open(path, "w") as fp:
+            fp.write(self.to_yaml())
+
+    def interpolated(self):
+        raise NotImplementedError('interpolated not implemented, normally this would '
+                                  'allow you to set values as references to other config variables')

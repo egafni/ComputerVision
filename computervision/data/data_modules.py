@@ -8,14 +8,14 @@ from torchvision.datasets import CIFAR10
 from torchvision.transforms import transforms
 
 from computervision.data.pre_processor import PreProcessor
-from computervision.utils.config_utils import ConfigClassMixin
+from computervision.utils.config_utils import ConfigMixin
 
 
 class CIFAR10DataModule(LightningDataModule):
     extra_args = {}
 
     @dataclass
-    class Config(ConfigClassMixin):
+    class Config(ConfigMixin):
         pre_processor: PreProcessor.Config
         data_dir: str = os.path.join(os.path.expanduser("~"), "ml_datasets", "cifar10")
         val_split: int = 5000
@@ -34,7 +34,7 @@ class CIFAR10DataModule(LightningDataModule):
         Cifar10 Datamodule
         """
         super().__init__(*args, **kwargs)
-        self.dims = (3, 32, 32)
+        # self.dims = (3, 32, 32)
         self.DATASET = CIFAR10
         self.config = config
         self.pre_processor = PreProcessor(self.config.pre_processor)

@@ -7,13 +7,13 @@ import torchmetrics
 import torchvision
 from torch import nn
 
-from computervision.utils.config_utils import ConfigClassMixin, REQUIRED
+from computervision.utils.config_utils import ConfigMixin, REQUIRED
 from computervision.utils.misc_utils import get_module_and_class_names
 
 
 class Classifier(pytorch_lightning.LightningModule):
     @dataclass
-    class Config(ConfigClassMixin):
+    class Config(ConfigMixin):
         backbone: str
 
         # ex: "torch.optim.AdamW"
