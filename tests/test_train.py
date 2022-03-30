@@ -1,6 +1,7 @@
 import tempfile
 
 from computervision.data.data_modules import CIFAR10DataModule
+from computervision.data.pre_processor import PreProcessor
 from computervision.lightning_modules.classifier import Classifier
 from computervision.train import TrainConfig, TrainerConfig, train_model
 
@@ -10,9 +11,15 @@ def test_train(tmpdir):
     config = TrainConfig(
         name='test',
         base_output_dir=tmpdir,
-        data_module=CIFAR10DataModule.Config(batch_size=2),
+        data_module=CIFAR10DataModule.Config(batch_size=2,
+                                             pre_processor=PreProcessor.Config('cifar10_default')),
         lightning_module=Classifier.Config(
-            backbone='resnet18'
+            backbone='resnet18',
+            optimizer_class="torch.optim.AdamW",
+            optimizer_init_params={'lr': 3e-4},
+            scheduler_class="torch.optim.lr_scheduler.ReduceLROnPlateau",
+            scheduler_init_params={'factor': 0.1, 'patience': 5},
+            scheduler_lightning_cfg={'monitor': 'val/acc', 'mode': 'min'},
         ),
         model_checkpoint=dict(
             monitor="val/loss",
@@ -34,8 +41,13 @@ def test_train(tmpdir):
         )
     )
 
-    train_model(config)
+    results, trainer, data_module = train_model(config)
+    print(results)
+    assert results['callback_metrics']['test/loss'] == 2.326857328414917
+
 
 if __name__ == '__main__':
+    # Nicer to run outside of pytest for debugging so that output is streamed to console
+    # ex: CUDA_VISIBLE_DEVICES= poetry run python3 tests/test_train.py
     with tempfile.TemporaryDirectory() as tmpdir:
         test_train(tmpdir)

@@ -2,11 +2,10 @@ from dataclasses import dataclass
 from importlib import import_module
 
 import pytorch_lightning
-import torch
 import torch.nn.functional as F
+import torchmetrics
 import torchvision
 from torch import nn
-from torchmetrics.functional import accuracy
 
 from computervision.utils.config_utils import ConfigClassMixin, REQUIRED
 from computervision.utils.misc_utils import get_module_and_class_names
@@ -34,6 +33,8 @@ class Classifier(pytorch_lightning.LightningModule):
     def __init__(self, config: Config):
         super(Classifier, self).__init__()
 
+        self.config = config
+
         self.model = config.backbone
         self.save_hyperparameters()
 
@@ -43,33 +44,37 @@ class Classifier(pytorch_lightning.LightningModule):
         num_ftrs = self.backbone.fc.in_features
         self.backbone.fc = nn.Linear(num_ftrs, 10)
 
+        # Create metrics
+        metrics = dict()
+        for stage in ['train', 'val', 'test']:
+            metrics[f'{stage}/acc'] = torchmetrics.Accuracy()
+
+        self.metrics = nn.ModuleDict(metrics)
+
     def forward(self, x):
         out = self.backbone(x)
         return F.log_softmax(out, dim=1)
 
-    def training_step(self, batch, batch_idx):
+    def _step(self, batch, batch_idx, stage):
         x, y = batch
         logits = self(x)
         loss = F.nll_loss(logits, y)
-        self.log("train_loss", loss)
+
+        self.metrics[f'{stage}/acc'](logits, y)
+
+        self.log(f"{stage}/loss", loss, prog_bar=True)
+        self.log(f"{stage}/acc", self.metrics[f'{stage}/acc'], prog_bar=True)
+
         return loss
 
-    def evaluate(self, batch, stage=None):
-        x, y = batch
-        logits = self(x)
-        loss = F.nll_loss(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        acc = accuracy(preds, y)
-
-        if stage:
-            self.log(f"{stage}_loss", loss, prog_bar=True)
-            self.log(f"{stage}_acc", acc, prog_bar=True)
+    def training_step(self, batch, batch_idx):
+        return self._step(batch, batch_idx, 'train')
 
     def validation_step(self, batch, batch_idx):
-        self.evaluate(batch, "val")
+        self._step(batch, batch_idx, 'val')
 
     def test_step(self, batch, batch_idx):
-        self.evaluate(batch, "test")
+        self._step(batch, batch_idx, 'test')
 
     def configure_optimizers(self):
         """
