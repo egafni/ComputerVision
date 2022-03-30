@@ -29,6 +29,12 @@ Install poetry: https://python-poetry.org/docs/#installation
 
 Dockerfile to build the image
 
+## CI/CD (TODO)
+
+Add CI/CD.  I like to use gitlab or github workflows.  Builds the docker contrainer & runs the tests. Often I will have to test runner on the development server s
+For more advanced projects, I'll have the tests running a local server so that the docker images 
+are easily cached and it can have access to GPUs and production/R&D data.
+
 ## Submitting Cloud Individual Jobs (TODO)
 
     The submit.py script allows you to run any arbitrary command (such as training a model) in the cloud

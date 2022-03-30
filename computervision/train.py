@@ -21,7 +21,7 @@ from computervision.utils.config_utils import ConfigMixin, REQUIRED
 @dataclass
 class TrainerConfig(ConfigMixin):
     """pytorch_lightning.Trainer parameters, for detailed help see the pytorch_lightning documentation"""
-
+    accelerator: str = REQUIRED
     limit_train_batches: Union[int, float, None] = field(
         default=None,
         metadata=dict(help="limit the number of training batches, can be useful for quick testing"),
