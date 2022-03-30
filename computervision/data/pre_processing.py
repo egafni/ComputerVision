@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from computervision.utils.config_utils import ConfigClassMixin
+from vision.utils.config_utils import ConfigClassMixin
 
 
 @dataclass
