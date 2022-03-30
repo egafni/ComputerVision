@@ -1,3 +1,10 @@
+import logging
+import subprocess
+from multiprocessing import cpu_count
+from subprocess import check_output
+
+logger = logging.getLogger(__name__)
+
 class ClassPropertyDescriptor:
     """copied from https://stackoverflow.com/questions/5189699/how-to-make-a-class-property"""
 
@@ -31,3 +38,17 @@ def classproperty(func):
         func = classmethod(func)
 
     return ClassPropertyDescriptor(func)
+
+def log_system_info():
+    # log system info
+    logger.info('*** System Info ****')
+    logger.info(check_output("free -h", shell=True))
+    logger.info(check_output("df -h", shell=True))
+    logger.info(check_output("env", shell=True))
+    try:
+        logger.info(check_output("nvidia-smi", shell=True))
+    except subprocess.SubprocessError:
+        pass
+
+    logger.info("**** CPUs ****")
+    logger.info(f"{cpu_count()} CPUs detected")

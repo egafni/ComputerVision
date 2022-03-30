@@ -24,6 +24,7 @@ class CIFAR10DataModule(LightningDataModule):
         num_workers: int = 16
         batch_size: int = 32
         seed: int = 42
+        class_balance: bool = False # apply class weights to the loss
 
     def __init__(
             self,
@@ -73,6 +74,10 @@ class CIFAR10DataModule(LightningDataModule):
         self.seed = config.seed
         self.data_dir = config.data_dir if config.data_dir is not None else os.path.join(os.path.expanduser("~"),
                                                                                          "ml_datasets", "cifar10")
+
+        if config.class_balance:
+            raise NotImplementedError("Class balance not implemented, and CIFAR10 is class balanced anyway.")
+
         self.num_samples = 60000 - config.val_split
 
     @property
