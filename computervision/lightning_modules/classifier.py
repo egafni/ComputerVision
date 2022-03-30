@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytorch_lightning
 
-from vision.utils.config_utils import ConfigClassMixin
+from computervision.utils.config_utils import ConfigClassMixin
 
 
 class Classifier(pytorch_lightning.LightningModule):

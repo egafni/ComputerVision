@@ -10,7 +10,7 @@ from dacite import DaciteError
 from dataclasses import fields
 from pytorch_lightning.utilities.cloud_io import get_filesystem
 
-from vision.utils.misc_utils import classproperty
+from computervision.utils.misc_utils import classproperty
 
 
 class _REQUIRED:

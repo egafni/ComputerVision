@@ -1,7 +1,7 @@
 import pytest
 from dacite import DaciteError
 
-from vision.utils.config_utils import check_required, REQUIRED
+from computervision.utils.config_utils import check_required, REQUIRED
 
 
 def test_required():

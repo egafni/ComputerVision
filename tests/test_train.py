@@ -1,15 +1,17 @@
-from vision.data.data_modules import CIFAR10DataModule
-from vision.lightning_modules.classifier import Classifier
-from vision.train import TrainConfig, TrainerConfig
+import tempfile
+
+from computervision.data.data_modules import CIFAR10DataModule
+from computervision.lightning_modules.classifier import Classifier
+from computervision.train import TrainConfig, TrainerConfig, train_model
 
 
 def test_train(tmpdir):
     tmpdir = str(tmpdir)
     config = TrainConfig(
         name='test',
-        output_dir=tmpdir,
-        data_module=CIFAR10DataModule.Config(),
-        lit_module=Classifier.Config(
+        base_output_dir=tmpdir,
+        data_module=CIFAR10DataModule.Config(batch_size=2),
+        lightning_module=Classifier.Config(
             backbone='resnet18'
         ),
         model_checkpoint=dict(
@@ -32,4 +34,8 @@ def test_train(tmpdir):
         )
     )
 
-    train(config)
+    train_model(config)
+
+if __name__ == '__main__':
+    with tempfile.TemporaryDirectory() as tmpdir:
+        test_train(tmpdir)
