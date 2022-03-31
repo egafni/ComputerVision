@@ -8,6 +8,8 @@ from computervision.train import TrainConfig, TrainerConfig, train_model
 
 
 def test_train(tmpdir):
+    # testing other architectures/datasets would entail adding another function with the right config
+
     tmpdir = str(tmpdir)
     config = TrainConfig(
         name='test',

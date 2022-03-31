@@ -79,6 +79,47 @@ class MultipleSeeds(ExperimentGroup):
             yield config
 
 
+class CifarParameterSweep(ExperimentGroup):
+    def __iter__(self):
+        # example code for choosing parameters
+        # obviously you could also use sampling or any other method
+        # you can also integrate smarter algorithms like Bayesian optimization using optuna
+        for lr in [1e-2, 1e-3, 1e-4]:
+            for weight_decay in [1e-5, 1e-6]:
+                yield TrainConfig(
+                    name=f'cifar-param-sweep__lr-{lr}__weight-decay-{weight_decay}',
+                    base_output_dir='experiments',
+                    data_module=Cifar10DataModule.Config(batch_size=2048,
+                                                         num_workers=16,
+                                                         pre_processor=Cifar10PreProc.Config()),
+                    lightning_module=Classifier.Config(
+                        backbone=Resnet.Config(input_size=(3, 32, 32), resnet_version='resnet18', num_classes=10,
+                                               pretrained=False),
+                        optimizer_class="torch.optim.AdamW",
+                        optimizer_init_params={'lr': lr, 'weight_decay': weight_decay},
+                        scheduler_class="torch.optim.lr_scheduler.ReduceLROnPlateau",
+                        scheduler_init_params={'factor': 0.1, 'patience': 5, 'verbose': True},
+                        scheduler_lightning_cfg={'monitor': 'val/acc', 'mode': 'min'},
+                    ),
+                    model_checkpoint=dict(
+                        monitor="val/loss",
+                        mode="max",
+                        filename="epoch{epoch}__step{step}__val_loss{val/loss:.2f}",
+                        auto_insert_metric_name=False,
+                        save_top_k=5,
+                        verbose=True,
+                    ),
+                    early_stopping=None,
+                    experiment_group='test',
+                    seed=1,
+                    trainer=TrainerConfig(
+                        gpu=1,
+                        max_epochs=500,
+                        accelerator='gpu'
+                    )
+                )
+
+
 def main(args=None):
     parser = ArgumentParser()
     parser.add_argument(

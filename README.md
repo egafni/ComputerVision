@@ -27,8 +27,9 @@ Install poetry: https://python-poetry.org/docs/#installation
 
 examples:
 
-    $ poetry run python run_experiments.py -e Cifar10 -m run
-    $ poetry run python run_experiments.py -e DTD -m run
+    $ poetry run python scripts/run_experiments.py -e Cifar10 -m run
+    # something is weird about the DTD dataset causing resizing to fail, need to fix or change datasets
+    $ poetry run python scripts/run_experiments.py -e DTD -m run  
 
 
 ## Docker (TODO)
