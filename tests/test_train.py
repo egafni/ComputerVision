@@ -1,7 +1,8 @@
 import tempfile
 
-from computervision.data.data_modules import CIFAR10DataModule
-from computervision.data.pre_processor import PreProcessor
+from computervision.data.data_modules import Cifar10DataModule
+from computervision.data.pre_processor import Cifar10PreProc
+from computervision.lightning_modules.backbones import Resnet
 from computervision.lightning_modules.classifier import Classifier
 from computervision.train import TrainConfig, TrainerConfig, train_model
 
@@ -11,10 +12,11 @@ def test_train(tmpdir):
     config = TrainConfig(
         name='test',
         base_output_dir=tmpdir,
-        data_module=CIFAR10DataModule.Config(batch_size=2,
-                                             pre_processor=PreProcessor.Config('cifar10_default')),
+        data_module=Cifar10DataModule.Config(batch_size=2,
+                                             num_workers=0,
+                                             pre_processor=Cifar10PreProc.Config(random_crop_size=32)),
         lightning_module=Classifier.Config(
-            backbone='resnet18',
+            backbone=Resnet.Config(input_size=(3, 32, 32), resnet_version='resnet18', num_classes=10, pretrained=False),
             optimizer_class="torch.optim.AdamW",
             optimizer_init_params={'lr': 3e-4},
             scheduler_class="torch.optim.lr_scheduler.ReduceLROnPlateau",
@@ -44,7 +46,7 @@ def test_train(tmpdir):
 
     results, trainer, data_module = train_model(config)
     print(results)
-    assert results['callback_metrics']['test/loss'] == 2.326857328414917
+    assert results['callback_metrics']['test/loss'] == 2.422407388687134
 
 
 if __name__ == '__main__':

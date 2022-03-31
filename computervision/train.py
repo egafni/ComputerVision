@@ -13,7 +13,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping, Stoc
     ModelCheckpoint, DeviceStatsMonitor
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 
-from computervision.data.data_modules import CIFAR10DataModule
+from computervision.data.data_modules import Cifar10DataModule, DTDDataModule
 from computervision.lightning_modules.classifier import Classifier
 from computervision.utils.config_utils import ConfigMixin, REQUIRED
 
@@ -47,7 +47,6 @@ class TrainerConfig(ConfigMixin):
         ),
     )
 
-
 @dataclass
 class TrainConfig(ConfigMixin):
     """Top level config for training a model"""
@@ -57,7 +56,7 @@ class TrainConfig(ConfigMixin):
 
     base_output_dir: str = field(metadata=dict(help="output directory to store results in"))
 
-    data_module: CIFAR10DataModule.Config = field(metadata=dict(help="DataModule Config"))
+    data_module: Union[Cifar10DataModule.Config, DTDDataModule.Config] = field(metadata=dict(help="DataModule Config"))
     trainer: TrainerConfig = field(metadata=dict(help="Parameters to pass to pytorch_lightning.Trainer"))
     lightning_module: Union[Classifier.Config] = field(
         metadata=dict(help="pl.LightningModule Config")
@@ -92,6 +91,7 @@ class TrainConfig(ConfigMixin):
     )
 
     seed: int = 42
+    fit_ckpt_path: Optional[str] = field(default=None, metadata=dict(help="load trainer and model state from this checkpoint"))
 
     @property
     def output_dir(self):
@@ -103,6 +103,13 @@ class TrainConfig(ConfigMixin):
         else:
             raise AssertionError(f"Unknown lightning module type: {type(self.lightning_module)}")
 
+    def get_data_module(self):
+        if type(self.data_module) == Cifar10DataModule.Config:
+            return Cifar10DataModule(self.data_module)
+        elif type(self.data_module) == DTDDataModule.Config:
+            return DTDDataModule(self.data_module)
+        else:
+            raise AssertionError(f"Unknown data module type: {type(self.data_module)}")
 
 def train_model(config: TrainConfig):
     seed_everything(config.seed)
@@ -120,7 +127,7 @@ def train_model(config: TrainConfig):
     else:
         logger = CSVLogger(save_dir=f"{config.output_dir}/logs", name=config.name)
 
-    data_module = CIFAR10DataModule(config.data_module)
+    data_module = config.get_data_module()
     data_module.prepare_data()
     lit_module = config.get_lightning_module()
 
@@ -164,7 +171,7 @@ def train_model(config: TrainConfig):
     )
 
     metrics = {}
-    trainer.fit(lit_module, data_module)
+    trainer.fit(lit_module, data_module, ckpt_path=config.fit_ckpt_path)
     metrics.update(trainer.callback_metrics)
     trainer.test(ckpt_path="best", datamodule=data_module)
     metrics.update(trainer.callback_metrics)

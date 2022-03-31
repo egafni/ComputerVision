@@ -16,6 +16,8 @@ torchmetrics = "^0.7.3"
 ipdb = "^0.13.9"
 jupyterlab = "^3.3.2"
 dacite = "^1.6.0"
+jupyter = "^1.0.0"
+importlib-resources = "^5.6.0"
 
 [tool.poetry.dev-dependencies]
 

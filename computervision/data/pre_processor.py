@@ -1,34 +1,57 @@
 from dataclasses import dataclass
 
 from torchvision.transforms import RandomCrop, RandomHorizontalFlip, ToTensor, Normalize, Compose
+
 from computervision.utils.config_utils import ConfigMixin
 
 
-class PreProcessor:
+class Cifar10PreProc:
     @dataclass
     class Config(ConfigMixin):
-        transform_name: str
+        random_crop_size: int = 32
+        unique_config_id: str = 'Cifar10PreProcess'
 
-    def __init__(self, config: Config):
+    def __init__(self, config):
         self.config = config
 
-        if config.transform_name == 'cifar10_default':
-            self.transforms = dict(
-                train=Compose([
-                    RandomCrop(32, padding=4),
-                    RandomHorizontalFlip(),
-                    ToTensor(),
-                    Normalize(mean=(0.49139968, 0.48215827, 0.44653124),
-                              std=(0.24703233, 0.24348505, 0.26158768)),
-                ]
-                ),
-                test=Compose([
-                    ToTensor(),
-                    Normalize(mean=(0.49139968, 0.48215827, 0.44653124),
-                              std=(0.24703233, 0.24348505, 0.26158768)),
-                ])
-            )
-        else:
-            raise ValueError(f'Unknown transform name: {config.transform_name}')
+        self.transforms = dict(
+            train=Compose([
+                RandomCrop(config.random_crop_size, padding=4),
+                RandomHorizontalFlip(),
+                ToTensor(),
+                Normalize(mean=(0.49139968, 0.48215827, 0.44653124),
+                          std=(0.24703233, 0.24348505, 0.26158768)),
+            ]
+            ),
+            test=Compose([
+                ToTensor(),
+                Normalize(mean=(0.49139968, 0.48215827, 0.44653124),
+                          std=(0.24703233, 0.24348505, 0.26158768)),
+            ])
+        )
 
 
+class DTDPreProc:
+    @dataclass
+    class Config(ConfigMixin):
+        random_crop_size: int = 40
+        unique_config_id: str = 'DTDPreProcess'
+
+    def __init__(self, config):
+        self.config = config
+
+        self.transforms = dict(
+            train=Compose([
+                RandomCrop(config.random_crop_size, padding=4),
+                RandomHorizontalFlip(),
+                ToTensor(),
+                # Normalize(mean=(0.49139968, 0.48215827, 0.44653124),
+                #           std=(0.24703233, 0.24348505, 0.26158768)),
+            ]
+            ),
+            test=Compose([
+                ToTensor(),
+                # Normalize(mean=(0.49139968, 0.48215827, 0.44653124),
+                #           std=(0.24703233, 0.24348505, 0.26158768)),
+            ])
+        )

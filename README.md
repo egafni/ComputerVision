@@ -25,6 +25,12 @@ Install poetry: https://python-poetry.org/docs/#installation
 
     $ poetry run python run_experiments.py -e ExperimentGroupName -m run
 
+ex:
+    $ poetry run python run_experiments.py -e Cifar10 -m run
+    $ poetry run python run_experiments.py -e DTD -m run
+
+
+## Running Experiments with GPU
 ## Docker (TODO)
 
 Dockerfile to build the image
