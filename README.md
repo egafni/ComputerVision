@@ -55,3 +55,6 @@ in the exact environment of the current repository.
   2) Runs $COMMAND on an instance in the cloud inside the pushed Docker container
   3) Streams the output of the command to the console
 
+## Tensorboard
+
+    $  tensorboard --logdir experiments
