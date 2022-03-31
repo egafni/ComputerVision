@@ -25,7 +25,8 @@ Install poetry: https://python-poetry.org/docs/#installation
 
     $ poetry run python run_experiments.py -e ExperimentGroupName -m run
 
-ex:
+examples:
+
     $ poetry run python run_experiments.py -e Cifar10 -m run
     $ poetry run python run_experiments.py -e DTD -m run
 
