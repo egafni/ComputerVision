@@ -14,10 +14,8 @@ from computervision.utils.misc_utils import classproperty
 class _REQUIRED:
     """
     Dataclass inheritance is horrible due to the requirement that defaults follow non-defaults.  This is a hacky way
-    around that until we upgrade to python3.10 and can set @dataclass(kw_only=True),
-    removing the issues with inheritance.
+    around that until python3.10 when we can set @dataclass(kw_only=True),
     """
-
     pass
 
 
