@@ -1,5 +1,10 @@
 # ComputerVision
-Computer Vision Pytorch Framework
+Computer Vision Pytorch Framework.  Uses a unique method to configure complex pipelines that I've developed and iterated on over the years.
+Config schemas are specified of composable dataclasses, and are specified in a python file rather than yaml.
+Specifiying the config as yaml is still an option, and it is always saved for reproducability, but specifying configs in python
+provides all of the flexibility of code (for loops, if/else statements, generators) to specify parameters and config compositions.
+
+see run_experiments.py for an example.
 
 ## Install
 
