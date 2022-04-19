@@ -1,8 +1,10 @@
 # ComputerVision
 Computer Vision Pytorch Framework.  Uses a unique method to configure complex pipelines that I've developed and iterated on over the years.
-Config schemas are specified of composable dataclasses, and are specified in a python file rather than yaml.
-Specifiying the config as yaml is still an option, and it is always saved for reproducability, but specifying configs in python
-provides all of the flexibility of code (for loops, if/else statements, generators) to specify parameters and config compositions.
+Config schemas are specified as composable instantiated dataclasses, and are specified in a python module rather than yaml.
+Specifiying the config as yaml is still an option, and it is always saved for reproducability. 
+
+Specifying configs in python provides all of the flexibility of code (for loops, if/else statements, generators, sampling, etc) as well as all of the help of the IDE.
+This greatly speeds up iteration cycles, since you catch bugs before they happen. 
 
 see run_experiments.py for an example.
 
