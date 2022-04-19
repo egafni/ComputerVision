@@ -1,5 +1,8 @@
 # ComputerVision
-Computer Vision Pytorch Framework.  Uses a unique method to configure complex pipelines that I've developed and iterated on over the years.
+An example for how I configure a computer vision repo.
+
+# Configuration
+This repo a unique method to configure complex pipelines that I've developed and iterated on over the years.
 Config schemas are specified as composable instantiated dataclasses, and are specified in a python module rather than yaml.
 Specifiying the config as yaml is still an option, and it is always saved for reproducability. 
 
